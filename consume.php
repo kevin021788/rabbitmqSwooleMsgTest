@@ -1,12 +1,28 @@
 <?php
+/**
+ * 消费
+ * 是服务器处理队列中的数据
+ */
 #开启守护进程
 \Swoole\Process::daemon();
 #设置进程数量
-$workerNum = 8;
+$workerNum = 2;
 /*实例化swoole进程*/
 $pool = new Swoole\Process\Pool($workerNum);
 $pool->on("WorkerStart", function ($pool,$workerId) {
     echo "Worker#{$workerId} is started \n";
+    deal_order($workerId);
+});
+
+$pool->on("WorkerStop", function ($pool, $workerId) {
+    echo "Worker#{$workerId} is stoped";
+});
+
+$pool->start();
+
+
+function deal_order($workerId)
+{
 
     /*交换机名称*/
     $exchangeName = 'trade';
@@ -55,7 +71,7 @@ $pool->on("WorkerStart", function ($pool,$workerId) {
                 $msg = $envelop->getBody();
                 echo "当前进程WorkerId是：{$workerId}，消费的内容是：".$msg."\n";
 
-                $queue->ack($envelop->getDeliveryTag());//手动发送ACK应答
+//                $queue->ack($envelop->getDeliveryTag());//手动发送ACK应答
             });
         }
 
@@ -66,10 +82,6 @@ $pool->on("WorkerStart", function ($pool,$workerId) {
 
     $amqpConnect->disconnect();
 
-});
 
-$pool->on("WorkerStop", function ($pool, $workerId) {
-    echo "Worker#{$workerId} is stoped";
-});
 
-$pool->start();
+}

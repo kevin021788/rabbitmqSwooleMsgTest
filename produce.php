@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * 客户端生成并发数据，然后把数据放进队列rabbitMQ
+ * */
 $amqpConnect = new AMQPConnection([
     'host' => '127.0.0.1',
     'port' => '5672',
@@ -40,7 +42,7 @@ try {
         'code' => '200',
         'msg' => 'success',
         'tid' => uniqid(),
-        'data' => 'hello world!',
+        'data' => 'hello world!'.time(),
     ];
     $msg = json_encode($msg);
     #生产消息发送
