@@ -12,6 +12,7 @@ $pool = new Swoole\Process\Pool($workerNum);
 $pool->on("WorkerStart", function ($pool,$workerId) {
     echo "Worker#{$workerId} is started \n";
     deal_order($workerId);
+    sleep(10);
 });
 
 $pool->on("WorkerStop", function ($pool, $workerId) {
@@ -66,12 +67,13 @@ function deal_order($workerId)
 
         echo "message:\n ";
         while (true) {
+            sleep(10);
             $queue->consume(function ($envelop,$queue) use($workerId)
             {
                 $msg = $envelop->getBody();
                 echo "当前进程WorkerId是：{$workerId}，消费的内容是：".$msg."\n";
 
-//                $queue->ack($envelop->getDeliveryTag());//手动发送ACK应答
+                $queue->ack($envelop->getDeliveryTag());//手动发送ACK应答
             });
         }
 

@@ -37,18 +37,18 @@ try {
     $queue->declareQueue();
     #绑定队列　
     $queue->bind($exchangeName, $routingKey);
+    for ($i = 0; $i < 10; $i++) {
 
-    $msg = [
-        'code' => '200',
-        'msg' => 'success',
-        'tid' => uniqid(),
-        'data' => 'hello world!'.time(),
-    ];
-    $msg = json_encode($msg);
-    #生产消息发送
-    $exchange->publish($msg, $routingKey);
+        $msg = 'hello world!：' . $i;
+        $msg = json_encode($msg);
+        #生产消息发送
+        $exchange->publish($msg, $routingKey);
 
-    echo $msg."\r\n";
+        echo $msg."\r\n";
+
+    }
+
+
 
 } catch (AMQPConnectionException $e) {
     var_dump($e);
